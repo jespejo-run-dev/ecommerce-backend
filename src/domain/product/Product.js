@@ -12,6 +12,15 @@ class Product {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.categoryId = categoryId;
+    this.formattedPrice = this.formatPrice(price);
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0,
+    }).format(price);
   }
   
   getInfo() {

@@ -1,11 +1,13 @@
 import prisma from '../../infrastructure/db/prismaClient.js';
-import Product from '../../domain/product/Product.js'; 
+import Product from '../../domain/product/Product.js';
 
 class ProductRepository {
   // Crear un producto
   static async create(productData) {
+    // Generar slug
     const slug = productData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
+    // Validar SKU duplicado
     const existingProductBySku = await prisma.product.findUnique({
       where: { sku: productData.sku },
     });
@@ -14,27 +16,17 @@ class ProductRepository {
       throw new Error('El producto con este SKU ya existe.');
     }
 
-    const productWithSlug = { ...productData, slug };
+    const product = await prisma.product.create({
+      data: { ...productData, slug },
+    });
 
-    try {
-      const createdProduct = await prisma.product.create({
-        data: productWithSlug,
-      });
-
-      return new Product(createdProduct);
-    } catch (error) {
-      if (error.code === 'P2002' && error.meta.target.includes('slug')) {
-        throw new Error('El producto ya existe. El slug generado ya está en uso.');
-      }
-
-      throw new Error(`Error al crear el producto: ${error.message}`);
-    }
+    return new Product(product);
   }
 
   // Obtener todos los productos
   static async getAll() {
     const products = await prisma.product.findMany();
-    return products.map(product => new Product(product)); 
+    return products.map(product => new Product(product));
   }
 
   // Obtener un producto por SKU
@@ -47,12 +39,12 @@ class ProductRepository {
       throw new Error('Producto no encontrado');
     }
 
-    return new Product(product); 
+    return new Product(product);
   }
 
   // Actualizar un producto por SKU
   static async update(sku, updateData) {
-    // Si se pasa un nuevo nombre, generar un nuevo slug
+    // Si se actualiza el nombre, generar un nuevo slug
     if (updateData.name) {
       updateData.slug = updateData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
     }
@@ -78,18 +70,17 @@ class ProductRepository {
   static async deactivate(sku) {
     const updatedProduct = await prisma.product.update({
       where: { sku },
-      data: { status: "inactive" },  
+      data: { status: 'inactive' },
     });
 
-    return new Product(updatedProduct); 
+    return new Product(updatedProduct);
   }
-
 
   // Activar un producto por SKU
   static async activate(sku) {
     const updatedProduct = await prisma.product.update({
       where: { sku },
-      data: { status: "active" },  
+      data: { status: 'active' },
     });
 
     return new Product(updatedProduct);

@@ -3,6 +3,18 @@ import ProductRepository from '../../infrastructure/repositories/ProductReposito
 class ProductUseCase {
   // Crear un producto
   async create(productData) {
+    // Validación precio mínimo
+    const MIN_PRICE = 0.01;
+    if (productData.price < MIN_PRICE) {
+      throw new Error(`El precio del producto debe ser mayor que ${MIN_PRICE}.`);
+    }
+
+    // Validación stock mínimo
+    const MIN_STOCK = 1;
+    if (productData.stock < MIN_STOCK) {
+      throw new Error(`El stock de ${productData.name} está por debajo del mínimo permitido.`);
+    }
+
     try {
       const product = await ProductRepository.create(productData);
       return product;
@@ -25,9 +37,6 @@ class ProductUseCase {
   async getBySku(sku) {
     try {
       const product = await ProductRepository.getBySku(sku);
-      if (!product) {
-        throw new Error('Producto no encontrado');
-      }
       return product;
     } catch (error) {
       throw new Error('Error al obtener el producto: ' + error.message);
@@ -36,6 +45,18 @@ class ProductUseCase {
 
   // Actualizar un producto por SKU
   async update(sku, productData) {
+    // Validación precio mínimo
+    const MIN_PRICE = 0.01;
+    if (productData.price && productData.price < MIN_PRICE) {
+      throw new Error(`El precio del producto debe ser mayor que ${MIN_PRICE}.`);
+    }
+
+    // Validación stock mínimo
+    const MIN_STOCK = 1;
+    if (productData.stock && productData.stock < MIN_STOCK) {
+      throw new Error(`El stock de ${productData.name} está por debajo del mínimo permitido.`);
+    }
+
     try {
       const updatedProduct = await ProductRepository.update(sku, productData);
       return updatedProduct;
