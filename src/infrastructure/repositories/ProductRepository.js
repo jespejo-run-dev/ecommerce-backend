@@ -28,6 +28,36 @@ class ProductRepository {
     });
     return new Product(product);
   }
+
+  async updateBySku(sku, productData) {
+    try {
+        
+      const product = await prisma.product.update({
+        where: { sku },
+        data: productData,
+      });
+  
+      return product;
+    } catch (error) {
+      console.error("Error updating product:", error);
+      throw new Error('Error updating product');
+    }
+  }
+
+  
+  async updateStatusBySku(sku, status) {
+    try {
+      const product = await prisma.product.update({
+        where: { sku },
+        data: { status },
+      });
+      return product;
+    } catch (error) {
+      console.error("Error updating product status by SKU:", error);
+      throw new Error('Error updating product status');
+    }
+  }
+
 }
 
 export default ProductRepository;
