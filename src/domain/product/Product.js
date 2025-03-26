@@ -13,6 +13,19 @@ class Product {
     this.updatedAt = updatedAt;
     this.categoryId = categoryId;
   }
+  
+  getInfo() {
+    return {
+      sku: this.sku,
+      name: this.name,
+      description: this.description,
+      price: this.price,
+      stock: this.stock,
+      imageUrl: this.imageUrl,
+      slug: this.slug,
+      active: this.active,
+    };
+  }
 }
 
 export default Product;
