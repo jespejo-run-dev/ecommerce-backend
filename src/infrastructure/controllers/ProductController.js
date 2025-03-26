@@ -1,4 +1,4 @@
-import ProductUseCase from '../../application/product/ProductRepository.js';
+import ProductUseCase from '../../application/product/ProductUseCase.js';
 
 class ProductController {
   // Crear un producto
